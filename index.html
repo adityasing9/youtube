@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube Search Only</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    h1 {
+      color: #ff0000;
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <h1>YouTube Search</h1>
+  <input type="text" id="searchQuery" placeholder="Search YouTube...">
+  <button onclick="searchYouTube()">Search</button>
+
+  <script>
+    function searchYouTube() {
+      const query = document.getElementById("searchQuery").value.trim();
+      if (query) {
+        const searchURL = "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
+        window.open(searchURL, "_blank");
+      }
+    }
+
+    document.getElementById("searchQuery").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") searchYouTube();
+    });
+  </script>
+</body>
+</html>
