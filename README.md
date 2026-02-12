@@ -1,48 +1,31 @@
-# 🔍 Search Application
+# 📺 YouTube Search
 
-A simple search application with optional voice search support.
+This is a simple **YouTube Search** webpage hosted on GitHub Pages.
 
----
-
-## 🚀 Features
-
-- 🔎 Text-based search (Works in all browsers)
-- 🎤 Voice search (Google Chrome only)
+🔗 Live Demo: https://adityasing9.github.io/youtube/
 
 ---
 
-## ⚠️ Browser Compatibility
+## 🧠 What It Does
 
-### 🎤 Voice Search Support
-Voice search functionality is available **only in Google Chrome**.
+This page lets users:
 
-This is because the application uses the Web Speech API, which is fully supported in Chrome.
+- 🔍 Perform a YouTube search right from the browser
+- 📄 See results on the same site
+- 🤖 (Optional) Support voice input when using compatible browsers
 
-### 🌐 Other Browsers
-If you open this project in browsers like:
-
-- Mozilla Firefox
-- Brave 
-- Microsoft Edge
-- Safari
-- Others
-
-👉 The **search box will work normally**  
-❌ The **voice search feature will not work**
+The core functionality is built with HTML, CSS, and JavaScript.
 
 ---
 
-## ✅ Recommended Browser   
+## 📌 Browser Support
 
-For the best experience, please use:
+- 🎤 **Voice search works in supported browsers (Chrome recommended)**
+- 🔎 **Standard text search works in all modern browsers**
 
-**Google Chrome**
+> Note: Voice search may not work in some browsers due to limitations in web speech APIs.
 
---- 
+---
 
-## 📌 Note
+## 📂 Project Structure
 
-If voice search is not working, make sure:
-- You are using Google Chrome
-- Microphone permissions are allowed
-- Your internet connection is active
