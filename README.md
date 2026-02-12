@@ -26,5 +26,6 @@ Any updates pushed to the `main` branch will automatically update the live site.
 ## 👨‍💻 Author
 
 Aditya Sing
+
 Hosted on GitHub Pages 🚀
 
