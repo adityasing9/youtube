@@ -1,31 +1,30 @@
 # 📺 YouTube Search
 
-This is a simple **YouTube Search** webpage hosted on GitHub Pages.
+A simple YouTube search web application hosted using GitHub Pages.
 
 🔗 Live Demo: https://adityasing9.github.io/youtube/
 
 ---
 
-## 🧠 What It Does
+## 🚀 Features
 
-This page lets users:
-
-- 🔍 Perform a YouTube search right from the browser
-- 📄 See results on the same site
-- 🤖 (Optional) Support voice input when using compatible browsers
-
-The core functionality is built with HTML, CSS, and JavaScript.
+- 🔍 Search for YouTube videos
+- 📄 Display results dynamically
+- ⚡ Fast and lightweight interface
+- 🌐 Works in all modern browsers
 
 ---
 
-## 📌 Browser Support
+## 🌍 Deployment
 
-- 🎤 **Voice search works in supported browsers (Chrome recommended)**
-- 🔎 **Standard text search works in all modern browsers**
+This project is deployed using **GitHub Pages**.
 
-> Note: Voice search may not work in some browsers due to limitations in web speech APIs.
+Any updates pushed to the `main` branch will automatically update the live site.
 
 ---
 
-## 📂 Project Structure
+## 👨‍💻 Author
+
+Aditya Singh  
+Hosted on GitHub Pages 🚀
 
