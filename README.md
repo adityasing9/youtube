@@ -22,7 +22,7 @@ This is because the application uses the Web Speech API, which is fully supporte
 If you open this project in browsers like:
 
 - Mozilla Firefox
-- Brave
+- Brave 
 - Microsoft Edge
 - Safari
 - Others
@@ -38,7 +38,7 @@ For the best experience, please use:
 
 **Google Chrome**
 
----
+--- 
 
 ## 📌 Note
 
