@@ -3,7 +3,8 @@
 A simple YouTube search web application hosted using GitHub Pages.
 
 🔗 Live Demo: https://adityasing9.github.io/youtube/  <br>
-v2: https://adityasing9.github.io/youtube/v2/
+v2: https://adityasing9.github.io/youtube/v2/ <br>
+v3: https://adityasing9.github.io/youtube/v3/
 ---
 
 ## 🚀 Features
