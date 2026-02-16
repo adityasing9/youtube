@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="image.png">
+  <link rel="apple-touch-icon" href="image.png">
+  <meta name="theme-color" content="#ff0000">
+
+  <title>YouTube Search</title>
+
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    h1 {
+      color: #ff0000;
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #cc0000;
+    }
+
+    .history {
+      margin-top: 30px;
+      width: 300px;
+      text-align: left;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history h3 {
+      margin: 0;
+      color: #ff0000;
+    }
+
+    .clear-btn {
+      background: none;
+      color: #aaa;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .clear-btn:hover {
+      color: #fff;
+    }
+
+    .history-item {
+      cursor: pointer;
+      padding: 6px;
+      border-bottom: 1px solid #333;
+      font-size: 14px;
+    }
+
+    .history-item:hover {
+      background-color: #222;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>YouTube Search</h1>
+
+  <form onsubmit="searchYouTube(event)">
+    <input type="text" id="searchQuery" placeholder="Search YouTube...">
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="history">
+    <div class="history-header">
+      <h3>Recent Searches</h3>
+      <button class="clear-btn" onclick="clearHistory()">Clear All</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <script>
+    const input = document.getElementById("searchQuery");
+    const historyList = document.getElementById("historyList");
+
+    window.onload = function() {
+      input.focus();
+      loadHistory();
+    };
+
+    function searchYouTube(event) {
+      event.preventDefault();
+
+      const query = input.value.trim();
+
+      if (!query) {
+        alert("Please enter something to search.");
+        return;
+      }
+
+      saveToHistory(query);
+
+      const searchURL = "https://www.youtube.com/results?search_query=" 
+                        + encodeURIComponent(query);
+
+      window.location.href = searchURL;
+    }
+
+    function saveToHistory(query) {
+      let history = JSON.parse(localStorage.getItem("ytHistory")) || [];
+
+      if (!history.includes(query)) {
+        history.unshift(query);
+      }
+
+      history = history.slice(0, 5);
+
+      localStorage.setItem("ytHistory", JSON.stringify(history));
+    }
+
+    function loadHistory() {
+      let history = JSON.parse(localStorage.getItem("ytHistory")) || [];
+      historyList.innerHTML = "";
+
+      if (history.length === 0) {
+        historyList.innerHTML = "<div style='color:#555;font-size:13px;'>No recent searches</div>";
+        return;
+      }
+
+      history.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.textContent = item;
+        div.onclick = () => {
+          input.value = item;
+          searchYouTube(new Event('submit'));
+        };
+        historyList.appendChild(div);
+      });
+    }
+
+    function clearHistory() {
+      const confirmClear = confirm("Are you sure you want to clear all searches?");
+      if (!confirmClear) return;
+
+      localStorage.removeItem("ytHistory");
+      loadHistory();
+    }
+  </script>
+
+</body>
+</html>
