@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="image.png">
+<link rel="apple-touch-icon" href="image.png">
+<meta name="theme-color" content="#ff0000">
+
+<title>YouTube Search</title>
+
+<style>
+
+/* ========== GLOBAL ========== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: black;
+  color: white;
+  overflow: hidden;
+}
+
+/* ========== LOGO SPLASH ========== */
+#logoSplash {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  transition: opacity 0.4s ease;
+}
+
+.logo {
+  width: 120px;
+  animation: logoZoom 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Premium Zoom + Bounce */
+@keyframes logoZoom {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ========== MAIN APP ========== */
+#app {
+  display: none;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  color: #ff0000;
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input[type="text"] {
+  width: 300px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #cc0000;
+}
+
+.history {
+  margin-top: 30px;
+  width: 300px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clear-btn {
+  background: none;
+  color: #aaa;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  color: white;
+}
+
+.history-item {
+  cursor: pointer;
+  padding: 6px;
+  border-bottom: 1px solid #333;
+  font-size: 14px;
+}
+
+.history-item:hover {
+  background-color: #222;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ========== LOGO SPLASH ========== -->
+<div id="logoSplash">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" class="logo">
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div id="app">
+
+  <h1>YouTube Search</h1>
+
+  <form onsubmit="searchYouTube(event)">
+    <input type="text" id="searchQuery" placeholder="Search YouTube...">
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="history">
+    <div class="history-header">
+      <h3 style="color:#ff0000;margin:0;">Recent Searches</h3>
+      <button class="clear-btn" onclick="clearHistory()">Clear All</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+</div>
+
+<script>
+
+const logoSplash = document.getElementById("logoSplash");
+const app = document.getElementById("app");
+const input = document.getElementById("searchQuery");
+const historyList = document.getElementById("historyList");
+
+/* Splash Logic */
+window.addEventListener("load", function() {
+
+  // Let animation finish smoothly
+  setTimeout(() => {
+    logoSplash.style.opacity = "0";
+  }, 1500);
+
+  setTimeout(() => {
+    logoSplash.style.display = "none";
+    app.style.display = "flex";
+    document.body.style.overflow = "auto";
+    input.focus();
+    loadHistory();
+  }, 1900);
+
+});
+
+/* Search */
+function searchYouTube(event) {
+  event.preventDefault();
+  const query = input.value.trim();
+
+  if (!query) {
+    alert("Please enter something to search.");
+    return;
+  }
+
+  saveToHistory(query);
+
+  window.location.href =
+    "https://www.youtube.com/results?search_query=" +
+    encodeURIComponent(query);
+}
+
+/* History Save */
+function saveToHistory(query) {
+  let history = JSON.parse(localStorage.getItem("ytHistory")) || [];
+  if (!history.includes(query)) history.unshift(query);
+  history = history.slice(0, 5);
+  localStorage.setItem("ytHistory", JSON.stringify(history));
+}
+
+/* Load History */
+function loadHistory() {
+  let history = JSON.parse(localStorage.getItem("ytHistory")) || [];
+  historyList.innerHTML = "";
+
+  if (history.length === 0) {
+    historyList.innerHTML =
+      "<div style='color:#555;font-size:13px;'>No recent searches</div>";
+    return;
+  }
+
+  history.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "history-item";
+    div.textContent = item;
+    div.onclick = () => {
+      input.value = item;
+      searchYouTube(new Event("submit"));
+    };
+    historyList.appendChild(div);
+  });
+}
+
+/* Clear History */
+function clearHistory() {
+  if (!confirm("Clear all searches?")) return;
+  localStorage.removeItem("ytHistory");
+  loadHistory();
+}
+
+</script>
+
+</body>
+</html>
