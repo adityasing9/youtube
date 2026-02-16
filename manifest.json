@@ -1,6 +1,6 @@
 {
   "name": "YouTube Search",
-  "short_name": "YT",
+  "short_name": "YouTube",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
