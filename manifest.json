@@ -1,18 +1,13 @@
 {
-  "name": "My Website",
-  "short_name": "MySite",
-  "start_url": "/",
+  "name": "YouTube Search",
+  "short_name": "YT",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#000000",
+  "theme_color": "#ff0000",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512.png",
+      "src": "image.png",
       "sizes": "512x512",
       "type": "image/png"
     }
