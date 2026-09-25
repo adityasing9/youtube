@@ -1,7 +1,13 @@
-# 🎯 NotDistract
+<p align="center">
+  <img src="icon.svg" width="120" height="120" alt="NotDistract Icon" />
+</p>
 
-> **YouTube without the distraction.**  
-> *Search → Watch → Focus → Finish → Leave.*
+<h1 align="center">NotDistract</h1>
+
+<p align="center">
+  <strong>YouTube without the distraction.</strong><br>
+  <em>Search → Watch → Focus → Finish → Leave.</em>
+</p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PWA Ready](https://img.shields.io/badge/PWA-Ready-10b981.svg)](manifest.json)

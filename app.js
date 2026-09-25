@@ -392,11 +392,8 @@
           // Limit to max 12 items for controlled results
           const videos = data.filter(item => item.type === 'video').slice(0, 12);
           return videos.map(item => {
-            let thumb = `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg`;
-            if (item.videoThumbnails && item.videoThumbnails.length > 0) {
-              const best = item.videoThumbnails.find(t => t.quality === 'high' || t.quality === 'medium') || item.videoThumbnails[0];
-              if (best && best.url) thumb = best.url;
-            }
+            // Always use official YouTube CDN for thumbnails to prevent proxy/Cloudflare blocking
+            const thumb = `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg`;
 
             return {
               id: item.videoId,
@@ -583,7 +580,14 @@
 
       card.innerHTML = `
         <div class="thumbnail-wrapper" tabindex="0" role="button" aria-label="Start Focus Mode on ${escapeHtml(video.title)}">
-          <img class="thumbnail-img" src="${escapeHtml(video.thumbnail)}" alt="${escapeHtml(video.title)}" loading="lazy">
+          <img 
+            class="thumbnail-img" 
+            src="${escapeHtml(video.thumbnail)}" 
+            alt="${escapeHtml(video.title)}" 
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            onerror="if(this.dataset.fallback!=='1'){this.dataset.fallback='1';this.src='https://img.youtube.com/vi/${video.id}/mqdefault.jpg';}else{this.src='https://img.youtube.com/vi/${video.id}/default.jpg';}"
+          >
           ${video.durationText ? `<span class="duration-badge">${escapeHtml(video.durationText)}</span>` : ''}
           <div class="play-hover-overlay">
             <div class="play-hover-icon">
@@ -687,12 +691,26 @@
     }
   }
 
-  // ==========================================================================
-  // FOCUS MODE (SIGNATURE FEATURE)
-  // ==========================================================================
-  async function openFocusModeById(videoId) {
-    const video = await SearchService.fetchOEmbed(videoId);
-    enterFocusMode(video);
+  function openFocusModeById(videoId) {
+    // Immediately activate Focus Mode with reliable initial data
+    enterFocusMode({
+      id: videoId,
+      title: `YouTube Video (${videoId})`,
+      channel: 'YouTube Creator',
+      thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+      durationText: ''
+    });
+
+    // Asynchronously enrich metadata via oEmbed
+    SearchService.fetchOEmbed(videoId).then(v => {
+      if (state.currentVideo && state.currentVideo.id === videoId) {
+        state.currentVideo.title = v.title;
+        state.currentVideo.channel = v.channel;
+        elements.focusVideoTitle.textContent = v.title;
+        elements.focusChannelName.textContent = v.channel;
+        Timer.persistActiveSession();
+      }
+    }).catch(() => {});
   }
 
   function enterFocusMode(video) {
