@@ -1,77 +1,595 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NotDistract — YouTube Without The Distraction</title>
   
- <link rel="manifest" href="manifest.json">
-<link rel="icon" href="image.png">
-<link rel="apple-touch-icon" href="image.png">
-<meta name="theme-color" content="#ff0000">
+  <meta name="description" content="Search → Watch → Focus → Finish → Leave. An intentional, distraction-free YouTube experience.">
+  <meta name="theme-color" content="#090a0f">
 
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="alternate icon" type="image/png" href="image.png">
+  <link rel="apple-touch-icon" href="image.png">
 
-  <title>YouTube Search Only</title>
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin: 0;
-    }
-
-    h1 {
-      color: #ff0000;
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
-
-    input[type="text"] {
-      width: 300px;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-    }
-
-    button {
-      margin-top: 12px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      background-color: #ff0000;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #cc0000;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>YouTube Search</h1>
-  <input type="text" id="searchQuery" placeholder="Search YouTube...">
-  <button onclick="searchYouTube()">Search</button>
 
-  <script>
-    function searchYouTube() {
-      const query = document.getElementById("searchQuery").value.trim();
-      if (query) {
-        const searchURL = "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
-        window.open(searchURL, "_blank");
-      }
-    }
+  <!-- Ambient visual backdrop glow -->
+  <div class="ambient-glow" aria-hidden="true"></div>
 
-    document.getElementById("searchQuery").addEventListener("keydown", function(e) {
-      if (e.key === "Enter") searchYouTube();
-    });
-  </script>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand-link" id="brandHomeLink" aria-label="NotDistract Home">
+        <div class="brand-icon">
+          <svg viewBox="0 0 512 512" width="28" height="28" fill="none">
+            <rect width="512" height="512" rx="112" fill="#181c2b"/>
+            <circle cx="256" cy="256" r="160" stroke="#2c344a" stroke-width="12" stroke-dasharray="16 12"/>
+            <path d="M 176 136 L 136 136 L 136 176" stroke="#ef4444" stroke-width="24" stroke-linecap="round"/>
+            <path d="M 336 136 L 376 136 L 376 176" stroke="#ef4444" stroke-width="24" stroke-linecap="round"/>
+            <path d="M 176 376 L 136 376 L 136 336" stroke="#ef4444" stroke-width="24" stroke-linecap="round"/>
+            <path d="M 336 376 L 376 376 L 376 336" stroke="#ef4444" stroke-width="24" stroke-linecap="round"/>
+            <circle cx="256" cy="256" r="88" fill="#ef4444"/>
+            <polygon points="234,212 300,256 234,300" fill="#ffffff"/>
+          </svg>
+        </div>
+        <span class="brand-name">NotDistract</span>
+        <span class="brand-pill">V5</span>
+      </a>
+
+      <nav class="header-nav" aria-label="Main Navigation">
+        <!-- Active Focus Session Indicator Pill -->
+        <button class="active-focus-pill" id="activeFocusPill" style="display: none;" title="Return to active focus session">
+          <span class="pulse-dot"></span>
+          <span id="activeFocusPillText">Focusing • 25:00</span>
+        </button>
+
+        <!-- Session History Button -->
+        <button class="nav-btn" id="openHistoryBtn" aria-label="View Session History" title="View Session History">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>History</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button class="nav-btn" id="openSettingsBtn" aria-label="Settings" title="App Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </button>
+
+        <!-- Install PWA Button (Hidden by default) -->
+        <button class="nav-btn" id="installPwaBtn" style="display: none;" aria-label="Install App" title="Install NotDistract">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Install</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main View Router -->
+  <main class="main-content" id="mainContainer">
+
+    <!-- ====================================================================
+         VIEW 1: SEARCH-FIRST HOMEPAGE
+         ==================================================================== -->
+    <section class="view-section active" id="homeView">
+      <div class="home-container">
+        
+        <!-- Philosophy Badge -->
+        <div class="philosophy-badge">
+          <span>Search</span>
+          <span class="arrow">→</span>
+          <span>Watch</span>
+          <span class="arrow">→</span>
+          <span>Focus</span>
+          <span class="arrow">→</span>
+          <span>Finish</span>
+          <span class="arrow">→</span>
+          <span>Leave</span>
+        </div>
+
+        <h1 class="home-title">
+          YouTube without the <span class="highlight">distraction.</span>
+        </h1>
+        <p class="home-tagline">
+          No feeds. No recommendations. No algorithmic rabbit holes. Search for what you need, focus completely, and leave when finished.
+        </p>
+
+        <!-- Large Search Box -->
+        <form class="search-form" id="searchForm" role="search">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              class="search-input" 
+              id="searchInput" 
+              placeholder="Search video topic or paste YouTube link..." 
+              autocomplete="off" 
+              autocapitalize="off" 
+              spellcheck="false"
+              required
+            >
+            <button type="button" class="search-clear-btn" id="searchClearBtn" aria-label="Clear search query">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <button type="submit" class="search-submit-btn" id="searchSubmitBtn">
+              <span>Search</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+          <div class="search-hint">
+            Tip: Search topic keywords (e.g. <em>"FastAPI Tutorial"</em>, <em>"DSA Graphs"</em>) or paste any YouTube URL / Video ID directly.
+          </div>
+        </form>
+
+        <!-- Recent Searches Box -->
+        <div class="recent-searches-box" id="recentSearchesBox" style="display: none;">
+          <div class="recent-header">
+            <span class="recent-title">Recent Searches</span>
+            <button type="button" class="clear-recent-btn" id="clearRecentBtn">Clear All</button>
+          </div>
+          <div class="recent-tags" id="recentTagsList"></div>
+        </div>
+
+        <!-- Focus Mode Explanation Card -->
+        <div class="philosophy-card">
+          <div class="philosophy-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="10 8 16 12 10 16 10 8"></polygon>
+            </svg>
+            <h3>How NotDistract Works</h3>
+          </div>
+          <div class="philosophy-grid">
+            <div class="philosophy-step">
+              <span class="step-num">Step 01</span>
+              <div class="step-title">Intentional Search</div>
+              <p class="step-desc">Enter only what you intend to learn or watch. No trending feeds or algorithmic suggestions pushing unsolicited content.</p>
+            </div>
+            <div class="philosophy-step">
+              <span class="step-num">Step 02</span>
+              <div class="step-title">Finite Results</div>
+              <p class="step-desc">Pick from a clean, controlled list of direct results. Zero infinite scroll or engagement traps designed to hook you.</p>
+            </div>
+            <div class="philosophy-step">
+              <span class="step-num">Step 03</span>
+              <div class="step-title">Focus Mode & Timer</div>
+              <p class="step-desc">Enter a dedicated viewing session. Set your focus timer (15, 25, 45 min) without sidebars, comments, or autoplay.</p>
+            </div>
+            <div class="philosophy-step">
+              <span class="step-num">Step 04</span>
+              <div class="step-title">Finish & Leave</div>
+              <p class="step-desc">When your timer ends, celebrate completing your session and close the app. Your session is logged locally in history.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 2: SEARCH RESULTS
+         ==================================================================== -->
+    <section class="view-section" id="resultsView">
+      <div class="results-header-bar">
+        <div class="results-info-group">
+          <h2 class="results-query-title" id="resultsQueryTitle">Results</h2>
+          <span class="results-count" id="resultsCount">0 videos</span>
+        </div>
+        <div class="results-actions">
+          <button class="back-to-search-btn" id="backToHomeBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>New Search</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Grid Container -->
+      <div class="videos-grid" id="videosGrid"></div>
+
+      <!-- Loading Skeleton State -->
+      <div class="videos-grid" id="resultsLoading" style="display: none;">
+        <div class="video-card skeleton-card">
+          <div class="skeleton-thumb"></div>
+          <div class="video-card-body">
+            <div class="skeleton-line title"></div>
+            <div class="skeleton-line channel"></div>
+            <div class="skeleton-line meta"></div>
+            <div class="skeleton-line btn"></div>
+          </div>
+        </div>
+        <div class="video-card skeleton-card">
+          <div class="skeleton-thumb"></div>
+          <div class="video-card-body">
+            <div class="skeleton-line title"></div>
+            <div class="skeleton-line channel"></div>
+            <div class="skeleton-line meta"></div>
+            <div class="skeleton-line btn"></div>
+          </div>
+        </div>
+        <div class="video-card skeleton-card">
+          <div class="skeleton-thumb"></div>
+          <div class="video-card-body">
+            <div class="skeleton-line title"></div>
+            <div class="skeleton-line channel"></div>
+            <div class="skeleton-line meta"></div>
+            <div class="skeleton-line btn"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="state-box" id="resultsEmpty" style="display: none;">
+        <div class="state-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </div>
+        <h3>No Videos Found</h3>
+        <p>We couldn't find matching videos for that search. Try different keywords or paste a direct YouTube video link.</p>
+        <div class="state-actions">
+          <button class="modal-btn primary" id="emptyStateSearchBtn">Try Another Search</button>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="state-box" id="resultsError" style="display: none;">
+        <div class="state-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3 id="errorStateTitle">Search Unavailable</h3>
+        <p id="errorStateDesc">Unable to connect to YouTube search. You can paste a direct YouTube URL or configure a free YouTube Data API key in Settings.</p>
+        <div class="state-actions">
+          <button class="modal-btn primary" id="errorRetryBtn">Retry Search</button>
+          <button class="modal-btn secondary" id="errorSettingsBtn">Configure API Key</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         VIEW 3: FOCUS MODE (The Signature Experience)
+         ==================================================================== -->
+    <section class="view-section" id="focusView">
+      <div class="focus-container">
+
+        <!-- Focus Top Bar -->
+        <div class="focus-top-bar">
+          <button class="focus-nav-back" id="leaveFocusBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Exit Focus</span>
+          </button>
+
+          <div class="focus-status-indicator active" id="focusStatusBadge">
+            <span class="pulse-dot"></span>
+            <span id="focusStatusBadgeText">Focus Session Active</span>
+          </div>
+        </div>
+
+        <!-- Focus Layout -->
+        <div class="focus-layout">
+          
+          <!-- Video Player Column -->
+          <div class="player-column">
+            <div class="player-frame-wrapper">
+              <iframe 
+                id="focusPlayer" 
+                class="player-frame" 
+                src="" 
+                title="YouTube Video Player - Distraction Free" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+            </div>
+
+            <div class="focus-video-details">
+              <h2 class="focus-video-title" id="focusVideoTitle">Loading Video...</h2>
+              <div class="focus-video-channel" id="focusVideoChannel">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span id="focusChannelName">Channel</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Focus Dashboard Column -->
+          <div class="focus-dashboard-column">
+            
+            <!-- Focus Timer Card -->
+            <div class="focus-card">
+              <div class="focus-card-header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>Focus Timer</span>
+                </h3>
+              </div>
+
+              <!-- Presets -->
+              <div class="preset-label">Session Duration</div>
+              <div class="preset-buttons" role="group" aria-label="Timer Duration Presets">
+                <button type="button" class="preset-btn" data-minutes="15">15 min</button>
+                <button type="button" class="preset-btn active" data-minutes="25">25 min</button>
+                <button type="button" class="preset-btn" data-minutes="45">45 min</button>
+                <button type="button" class="preset-btn" id="customPresetBtn" data-minutes="custom">Custom</button>
+              </div>
+
+              <!-- Custom Duration Input -->
+              <div class="custom-duration-input-wrapper" id="customDurationWrapper">
+                <input type="number" class="custom-min-input" id="customMinutesInput" min="1" max="180" value="30" aria-label="Custom minutes">
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">minutes</span>
+                <button type="button" class="nav-btn" id="applyCustomMinBtn" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">Set</button>
+              </div>
+
+              <!-- Circular Timer Display -->
+              <div class="timer-display-box">
+                <div class="timer-circle-container">
+                  <svg class="timer-svg" viewBox="0 0 170 170">
+                    <circle class="timer-circle-bg" cx="85" cy="85" r="75"></circle>
+                    <circle class="timer-circle-progress" id="timerProgressCircle" cx="85" cy="85" r="75" stroke-dasharray="471.24" stroke-dashoffset="0"></circle>
+                  </svg>
+                  <div class="timer-text-content">
+                    <div class="timer-countdown" id="timerDigits">25:00</div>
+                    <div class="timer-status-subtext" id="timerSubtext">Ready</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Timer Action Buttons -->
+              <div class="timer-action-buttons">
+                <button class="btn-primary-action" id="timerToggleBtn">
+                  <svg id="timerToggleIcon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <span id="timerToggleLabel">Start Focus</span>
+                </button>
+                <button class="btn-secondary-action" id="timerResetBtn" title="Reset Timer">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <polyline points="3 3 3 8 8 8"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Optional Session Intention Input -->
+              <div class="intention-box">
+                <label for="sessionIntentionInput" class="intention-label">Focus Objective (Optional)</label>
+                <input type="text" id="sessionIntentionInput" class="intention-input" placeholder="e.g. Learn React hooks pattern">
+              </div>
+
+              <!-- Finish Session Early Button -->
+              <button class="finish-session-btn" id="finishSessionBtn">Finish Session & Leave</button>
+            </div>
+
+            <!-- Focus Mode Tips Card -->
+            <div class="focus-tips-card">
+              <strong>Distraction Shield is Active:</strong> Recommended videos, comments, and sidebars are completely hidden. If you attempt to leave, NotDistract will prompt you to stay on course.
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       MODAL 1: DISTRACTION WARNING INTERVENTION
+       ====================================================================== -->
+  <div class="modal-backdrop" id="distractionModal" role="dialog" aria-modal="true" aria-labelledby="distractionTitle">
+    <div class="modal-card">
+      <div class="modal-icon-badge warning">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3 class="modal-title" id="distractionTitle">You're leaving your focus session</h3>
+      <p class="modal-desc">
+        Your focus timer is currently running. Leaving now will interrupt your intentional viewing session.
+      </p>
+
+      <div class="modal-video-preview">
+        <div class="modal-video-label">Current Focus</div>
+        <div class="modal-video-name" id="distractionVideoName">—</div>
+      </div>
+
+      <div class="modal-button-group">
+        <button class="modal-btn primary" id="stayFocusedBtn">Stay Focused</button>
+        <button class="modal-btn secondary" id="continueLeaveBtn">Continue & Leave</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 2: FOCUS SESSION COMPLETED
+       ====================================================================== -->
+  <div class="modal-backdrop" id="completedModal" role="dialog" aria-modal="true" aria-labelledby="completedTitle">
+    <div class="modal-card">
+      <div class="modal-icon-badge success">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h3 class="modal-title" id="completedTitle">Focus Session Completed</h3>
+      <p class="modal-desc">
+        Great work staying intentional! You have completed your scheduled focus block without distractions.
+      </p>
+
+      <div class="modal-video-preview">
+        <div class="modal-video-label">Completed Session</div>
+        <div class="modal-video-name" id="completedVideoName">—</div>
+        <div style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--success);" id="completedDurationText">25 min focused</div>
+      </div>
+
+      <div class="modal-button-group">
+        <button class="modal-btn primary" id="finishAndLeaveBtn">Finish & Return Home</button>
+        <button class="modal-btn secondary" id="keepWatchingBtn">Stay on Player</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 3: SESSION HISTORY
+       ====================================================================== -->
+  <div class="modal-backdrop" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <div class="modal-card history-modal-card">
+      <button class="modal-close-btn" id="closeHistoryBtn" aria-label="Close History">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <h3 class="modal-title" id="historyTitle">Session History</h3>
+      <p class="modal-desc" style="margin-bottom: 0.5rem;">
+        Your focus sessions stored locally in your browser.
+      </p>
+
+      <!-- Stats Bar -->
+      <div class="history-stats-bar">
+        <div class="stat-item">
+          <span class="stat-val" id="todaySessionsCount">0</span>
+          <span class="stat-label">Sessions Today</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val" id="todayTotalFocusTime">0m</span>
+          <span class="stat-label">Total Focus Time</span>
+        </div>
+      </div>
+
+      <!-- History List -->
+      <div class="history-list-scroll" id="historyListContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+        <button class="clear-recent-btn" id="clearAllHistoryBtn">Clear Local History</button>
+        <button class="modal-btn secondary" id="closeHistoryBottomBtn" style="padding: 0.5rem 1rem;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 4: SETTINGS
+       ====================================================================== -->
+  <div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="closeSettingsBtn" aria-label="Close Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <h3 class="modal-title" id="settingsTitle">Settings</h3>
+      <p class="modal-desc">
+        Customize your NotDistract experience. All settings are stored locally on your device.
+      </p>
+
+      <!-- YouTube Data API Key -->
+      <div class="settings-group">
+        <label for="settingsApiKeyInput" class="settings-label">YouTube Data API Key (Optional)</label>
+        <p class="settings-helper">
+          NotDistract includes public search fallbacks and direct link loading out-of-the-box. Adding your personal free Google YouTube Data API v3 key guarantees 100% quota reliability.
+        </p>
+        <input type="password" id="settingsApiKeyInput" class="settings-input" placeholder="AIzaSy...">
+      </div>
+
+      <!-- Default Duration -->
+      <div class="settings-group">
+        <label for="settingsDefaultDuration" class="settings-label">Default Focus Duration</label>
+        <select id="settingsDefaultDuration" class="settings-select">
+          <option value="15">15 minutes</option>
+          <option value="25" selected>25 minutes (Pomodoro)</option>
+          <option value="45">45 minutes (Deep Work)</option>
+        </select>
+      </div>
+
+      <!-- Audio Completion Chime Toggle -->
+      <div class="settings-group">
+        <div class="settings-toggle-row">
+          <div>
+            <span class="settings-label" style="margin-bottom: 0;">Completion Audio Chime</span>
+            <span class="settings-helper" style="display: block; margin-bottom: 0;">Play gentle audio bell when focus timer completes.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="settingsSoundToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-button-group" style="margin-top: 1.5rem;">
+        <button class="modal-btn primary" id="saveSettingsBtn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="philosophy-badge" style="margin-bottom: 0.5rem;">
+        <span>NotDistract</span>
+        <span class="arrow">•</span>
+        <span>Search → Watch → Focus → Finish → Leave</span>
+      </div>
+      <p>An intentional open-source video viewing tool. No algorithms, no distractions.</p>
+      <nav class="footer-nav-links" aria-label="Version Archives and Code Links">
+        <a href="v1/" class="footer-link">V1 Archive</a>
+        <a href="v2/" class="footer-link">V2 Archive</a>
+        <a href="v3/" class="footer-link">V3 Archive</a>
+        <a href="v4/" class="footer-link">V4 Archive</a>
+        <a href="https://github.com/adityasing9/youtube" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Repo</a>
+      </nav>
+      <p style="font-size: 0.75rem; color: var(--text-tertiary);">
+        Created by Aditya Sing. Hosted on GitHub Pages.
+      </p>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
 </body>
 </html>
