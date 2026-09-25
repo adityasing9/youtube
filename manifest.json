@@ -1,15 +1,26 @@
 {
-  "name": "YouTube Search",
-  "short_name": "YouTube",
-  "start_url": ".",
+  "name": "NotDistract - YouTube Without The Distraction",
+  "short_name": "NotDistract",
+  "description": "Search → Watch → Focus → Finish → Leave. An intentional, distraction-free YouTube viewing experience.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#ff0000",
+  "orientation": "any",
+  "background_color": "#090a0f",
+  "theme_color": "#090a0f",
+  "categories": ["productivity", "utilities"],
   "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
     {
       "src": "image.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
