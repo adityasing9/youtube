@@ -1,6 +1,7 @@
 import React from "react";
 import { Composition } from "remotion";
 import { NotDistractPromo } from "./Composition";
+import { NotDistractShorts } from "./ShortsComposition";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -23,6 +24,16 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1080}
         height={1080}
+      />
+
+      {/* 9:16 Vertical Video for YouTube Shorts, Instagram Reels & TikTok */}
+      <Composition
+        id="NotDistractShorts"
+        component={NotDistractShorts}
+        durationInFrames={510}
+        fps={30}
+        width={1080}
+        height={1920}
       />
     </>
   );
